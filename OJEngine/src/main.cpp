@@ -61,7 +61,7 @@ int main()
 			posY = rng.randomInteger<int>(0, WINDOW_HEIGHT);
 			maxVertecis = rng.randomInteger<int>(2, VERTEX_CAP);
 		}
-
+		
 		if (wnd.getKey(KEY_UP).held)
 		{
 			gfx.clear();
