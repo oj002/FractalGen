@@ -3,7 +3,9 @@
 #include "random.h"
 #define WINDOW_WIDTH 1820
 #define WINDOW_HEIGHT 980
-#define VERTEX_CAP 8
+#define VERTEX_CAP 8 
+#define MOVE_SPEED 1500
+#define ZOOM_SPEED 1000
 
 Window wnd(WINDOW_WIDTH, WINDOW_HEIGHT, "FractalGen\tPress R to regenerate fractal");
 Graphics gfx(&wnd);
@@ -42,16 +44,12 @@ int main()
 	int r = 0, g = 0, b = 0;
 	int maxVertecis = rng.randomInteger<int>(2, VERTEX_CAP);
 
+	timer t;
+
 	glfwSwapInterval(0);
 	while (!wnd.closed())
 	{
-		// calcs per frame
-		for (int j = 0; j < 1000; j++)
-		{
-			activate(posX, posY, r, g, b, rng.randomInteger<int>(0, maxVertecis));
-			gfx.putpixel(posX, posY, r, g, b);
-		}
-
+		float dt = t.restart<float>();
 		if (wnd.getKey(KEY_R).pressed)
 		{
 			gfx.clear();
@@ -62,10 +60,73 @@ int main()
 			posX = rng.randomInteger<int>(0, WINDOW_WIDTH);
 			posY = rng.randomInteger<int>(0, WINDOW_HEIGHT);
 			maxVertecis = rng.randomInteger<int>(2, VERTEX_CAP);
-			for (int j = 0; j < 10; j++)
+		}
+
+		if (wnd.getKey(KEY_UP).held)
+		{
+			gfx.clear();
+			for (size_t i = 0; i < maxVertecis; i++)
 			{
-				activate(posX, posY, r, g, b, rng.randomInteger<int>(0, maxVertecis));
+				vertecic[i].x *= 1.01f;
+				vertecic[i].y *= 1.01f;
 			}
+		}
+
+		if (wnd.getKey(KEY_DOWN).held)
+		{
+			gfx.clear();
+			for (size_t i = 0; i < maxVertecis; i++)
+			{
+				vertecic[i].x *= 0.99f;
+				vertecic[i].y *= 0.99f;
+			}
+		}
+
+		if (wnd.getKey(KEY_W).held)
+		{
+			gfx.clear();
+			for (size_t i = 0; i < maxVertecis; i++)
+			{
+				vertecic[i].y += MOVE_SPEED * dt;
+			}
+		}
+		if (wnd.getKey(KEY_S).held)
+		{
+			gfx.clear();
+			for (size_t i = 0; i < maxVertecis; i++)
+			{
+				vertecic[i].y += MOVE_SPEED * -dt;
+			}
+		}
+		if (wnd.getKey(KEY_A).held)
+		{
+			gfx.clear();
+			for (size_t i = 0; i < maxVertecis; i++)
+			{
+				vertecic[i].x += MOVE_SPEED * dt;
+			}
+		}
+		if (wnd.getKey(KEY_D).held)
+		{
+			gfx.clear();
+			for (size_t i = 0; i < maxVertecis; i++)
+			{
+				vertecic[i].x += MOVE_SPEED * -dt;
+			}
+		}
+
+
+
+		// calcs per frame
+		for (int j = 0; j < 10000; j++)
+		{
+			activate(posX, posY, r, g, b, rng.randomInteger<int>(0, maxVertecis - 1));
+			gfx.putpixel(posX, posY, r, g, b);
+		}
+		for (size_t i = 0; i < maxVertecis; i++)
+		{
+			gfx.drawLine(vertecic[i].x - 5, vertecic[i].y - 5, vertecic[i].x + 5, vertecic[i].y + 5, 255, 255, 255);
+			gfx.drawLine(vertecic[i].x - 5, vertecic[i].y + 5, vertecic[i].x + 5, vertecic[i].y - 5, 255, 255, 255);
 		}
 
 		gfx.display();
